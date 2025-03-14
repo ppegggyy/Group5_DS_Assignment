@@ -15,8 +15,6 @@ vector<int> generateRandomNumbers(int N) {
 }
 
 // --- Binary Search Algorithm ---
-// Explanation: Binary Search finds an element in a sorted array by repeatedly dividing the search range in half.
-// Time Complexity: O(log N) - Best, Average, Worst (requires sorted array).
 int binarySearch(vector<int>& arr, int target) {
     int left = 0;
     int right = arr.size() - 1;
@@ -35,13 +33,10 @@ int binarySearch(vector<int>& arr, int target) {
 }
 
 // --- Interpolation Search Algorithm ---
-// Explanation: Interpolation Search estimates the position of the target based on a linear interpolation formula.
-// It works best for uniformly distributed sorted data. Time Complexity: O(log log N) average, O(N) worst.
 int interpolationSearch(vector<int>& arr, int target) {
     int low = 0;
     int high = arr.size() - 1;
     while (low <= high && target >= arr[low] && target <= arr[high]) {
-        // Interpolation formula to estimate position
         int pos = low + ((target - arr[low]) * (high - low)) / (arr[high] - arr[low]);
         if (arr[pos] == target) {
             return pos; // Element found
@@ -56,8 +51,6 @@ int interpolationSearch(vector<int>& arr, int target) {
 }
 
 // --- Selection Sort Algorithm ---
-// Explanation: Selection Sort repeatedly finds the minimum element from the unsorted part and places it at the beginning.
-// Time Complexity: O(N^2) - Best, Average, Worst.
 void selectionSort(vector<int>& arr) {
     int n = arr.size();
     for (int i = 0; i < n - 1; i++) {
@@ -72,7 +65,6 @@ void selectionSort(vector<int>& arr) {
 }
 
 // --- Merge Sort Helper: Merge Function ---
-// Merges two sorted subarrays into one sorted array
 void merge(vector<int>& arr, int left, int mid, int right) {
     int n1 = mid - left + 1; // Size of left subarray
     int n2 = right - mid;    // Size of right subarray
@@ -98,8 +90,6 @@ void merge(vector<int>& arr, int left, int mid, int right) {
 }
 
 // --- Merge Sort Algorithm ---
-// Explanation: Merge Sort divides the array into halves, recursively sorts them, and merges them back.
-// Time Complexity: O(N log N) - Best, Average, Worst.
 void mergeSort(vector<int>& arr, int left, int right) {
     if (left < right) {
         int mid = left + (right - left) / 2; // Avoid overflow
@@ -109,57 +99,57 @@ void mergeSort(vector<int>& arr, int left, int right) {
     }
 }
 
-// Function to print array
-void printArray(const vector<int>& arr) {
-    for (int i = 0; i < arr.size(); i++) {
-        cout << arr[i] << " ";
-    }
-    cout << endl;
-}
-
 int main() {
     srand(time(0)); // Seed random number generator
-    int N, target;
+    vector<int> inputSizes = {10, 100, 1000, 10000, 100000, 1000000}; // Test with 6 sizes
+    int target;
 
-    // Input number of elements
-    cout << "Enter the number of random integers (N): ";
-    cin >> N;
+    for (int N : inputSizes) {
+        cout << "\nTesting with N = " << N << "\n";
 
-    // Generate random array
-    vector<int> arr = generateRandomNumbers(N);
-    cout << "Original Array: ";
-    printArray(arr);
+        // Generate random array
+        vector<int> arr = generateRandomNumbers(N);
 
-    // --- Sorting for Search Operations ---
-    vector<int> arrForSearch = arr; // Copy for searching (needs to be sorted)
-    mergeSort(arrForSearch, 0, N - 1); // Sort using Merge Sort for searching
-    cout << "Sorted Array (for searching): ";
-    printArray(arrForSearch);
+        // --- Sorting for Search Operations ---
+        vector<int> arrForSearch = arr; // Copy for searching
+        auto start = chrono::high_resolution_clock::now();
+        mergeSort(arrForSearch, 0, N - 1); // Sort for searching
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+        cout << "Merge Sort (for search) Time: " << duration.count() << " us\n";
 
-    // --- Search Operations ---
-    cout << "Enter a number to search: ";
-    cin >> target;
+        // --- Search Operations ---
+        target = arrForSearch[N/2]; // Pick a middle element as target (likely to exist)
 
-    // Binary Search
-    int binaryResult = binarySearch(arrForSearch, target);
-    cout << "Binary Search: " << (binaryResult == -1 ? "Not found" : "Found at index " + to_string(binaryResult)) << endl;
+        // Binary Search
+        start = chrono::high_resolution_clock::now();
+        int binaryResult = binarySearch(arrForSearch, target);
+        end = chrono::high_resolution_clock::now();
+        duration = chrono::duration_cast<chrono::microseconds>(end - start);
+        cout << "Binary Search Time: " << duration.count() << " us\n";
 
-    // Interpolation Search
-    int interpResult = interpolationSearch(arrForSearch, target);
-    cout << "Interpolation Search: " << (interpResult == -1 ? "Not found" : "Found at index " + to_string(interpResult)) << endl;
+        // Interpolation Search
+        start = chrono::high_resolution_clock::now();
+        int interpResult = interpolationSearch(arrForSearch, target);
+        end = chrono::high_resolution_clock::now();
+        duration = chrono::duration_cast<chrono::microseconds>(end - start);
+        cout << "Interpolation Search Time: " << duration.count() << " us\n";
 
-    // --- Sorting Operations ---
-    vector<int> arrForSort = arr; // Copy for sorting
-    cout << "\nSorting with Selection Sort...\n";
-    selectionSort(arrForSort);
-    cout << "Selection Sort Result: ";
-    printArray(arrForSort);
+        // --- Sorting Operations ---
+        vector<int> arrForSort = arr; // Copy for sorting
+        start = chrono::high_resolution_clock::now();
+        selectionSort(arrForSort);
+        end = chrono::high_resolution_clock::now();
+        duration = chrono::duration_cast<chrono::microseconds>(end - start);
+        cout << "Selection Sort Time: " << duration.count() << " us\n";
 
-    arrForSort = arr; // Reset array
-    cout << "Sorting with Merge Sort...\n";
-    mergeSort(arrForSort, 0, N - 1);
-    cout << "Merge Sort Result: ";
-    printArray(arrForSort);
+        arrForSort = arr; // Reset array
+        start = chrono::high_resolution_clock::now();
+        mergeSort(arrForSort, 0, N - 1);
+        end = chrono::high_resolution_clock::now();
+        duration = chrono::duration_cast<chrono::microseconds>(end - start);
+        cout << "Merge Sort Time: " << duration.count() << " us\n";
+    }
 
     return 0;
 }
